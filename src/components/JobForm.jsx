@@ -14,8 +14,12 @@ const JobForm = ({addJob, editId, jobs}) => {
                 setCompany(job.company)
                 setPosition(job.position)
                 setStatus(job.status)
+            } 
+        } else {
+                setCompany("")
+                setPosition("")
+                setStatus("Applied")
             }
-        }
     }, [editId, jobs])
 
         const handleSubmit = (e) => {
