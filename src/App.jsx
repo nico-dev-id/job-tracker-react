@@ -71,6 +71,7 @@ const App = () => {
          addJob={addJob} 
          editId={editId}
          jobs={jobs}
+         closeModal={() => setIsModalOpen(false)} //close modal setelah save
          />
 
          <div className="flex gap-2 my-4">
@@ -96,7 +97,8 @@ const App = () => {
         <div className="space-y-3">
 
           {filteredJobs.map((job) => (
-            <div key={job.id} className="bg-slate-800 p-4 rounded-lg flex justify-between items-center">
+            <div key={job.id} 
+                 className="bg-slate-800 p-4 rounded-lg flex justify-between items-center hover:bg-slate-700 transition">
               
               <div>
                 <h3 className="font-bold">{job.company}</h3>
@@ -113,11 +115,11 @@ const App = () => {
               <div className="flex gap-2">
                 <button
                  onClick={() => deleteJob(job.id)}
-                 className="bg-red-500 px-3 py-1 rounded-lg mt-2">Delete</button>
+                 className="bg-red-500 px-3 py-1 rounded-lg mt-2 hover:bg-red-700">Delete</button>
               
                 <button
                  onClick={() => handleEdit(job)}
-                 className="bg-yellow-500 px-3 py-1 rounded-lg mr-2 mt-2">Edit</button>
+                 className="bg-yellow-500 px-3 py-1 rounded-lg mr-2 mt-2 hover:bg-yellow-600">Edit</button>
               </div>
 
             </div>
@@ -126,22 +128,31 @@ const App = () => {
 
         {/* EDIT MODAL */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center">
-            <div className="bg-slate-900 text-white p-6 rounded-lg w-96">
+          <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+            <div className="bg-slate-900 text-white p-6 rounded-lg w-96
+                            transform transition-all duration-300 scale-95 opacity-0 animate-modal">
               <h2 className="text-lg font-bold mb-4">Edit Job</h2>
 
               <JobForm
                 addJob={addJob}
-                editId={editId}
+                editId={editId} 
                 jobs={jobs}
+                closeModal={() => setIsModalOpen(false)}
               />
 
               <button 
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false)
+                  setEditId(null)
+                }}
                 className="mt-4 bg-gray-500 px-3 py-1 rounded">Close</button>
 
             </div>
           </div>
+        )}
+
+        {jobs.length === 0 && (
+          <p className="text-center text-slate-400 mt-4">No jobs yet. Start adding one🚀</p>
         )}
 
       </div>
