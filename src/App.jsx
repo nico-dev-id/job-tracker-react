@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import Header from "./components/Header"
 import JobForm from "./components/JobForm"
+import { use } from "react"
 
 
 const App = () => {
@@ -12,6 +13,9 @@ const App = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+
   const [jobs, setJobs] = useState(() => {
     const saved = localStorage.getItem("jobs")
     const parsed = saved ? JSON.parse(saved): []
@@ -20,6 +24,34 @@ const App = () => {
       id:job.id || Date.now() + Math.random(),
     }))
   })
+
+  //AMBIL DATA DARI API
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setLoading(true)
+      setError("")
+
+      try {
+        const res = await fetch ("https://jsonplaceholder.typicode.com/users")
+        const data = await res.json()
+        const mapped = data.map((item) => ({
+          id: item.id,
+          company: item.company.name,
+          position: item.name,
+          status: "Applied",
+        }))
+        setJobs(mapped)
+      } catch (error) {
+        setError("gagal mengambil data")
+      } finally {
+        setLoading(false)
+      }
+    }
+    //HANYA FETCH KALAU KOSONG
+    if (jobs.length === 0) {
+      fetchJobs()
+    }
+  }, [])
   
   const addJob = (job) => {
     if (editId !== null) {
@@ -36,13 +68,14 @@ const App = () => {
     setJobs(filtered)
   }
 
-//edit
+  //edit
   const handleEdit = (job) => {
     //console.log("Edit diklik", job)
     setEditId(job.id)
     setIsModalOpen(true)
   }
 
+  //SIMPAN DATA KE LOCALSTORAGE
     useEffect(() => {
     localStorage.setItem("jobs", JSON.stringify(jobs))
   }, [jobs])
@@ -94,7 +127,10 @@ const App = () => {
             </select>
          </div>
 
-        <div className="space-y-3">
+         {loading && <p className="text-center">Loading...</p>}
+         {error && <p className="text-red-400 text-center">{error}</p>}
+
+        <div className="space-y-2">
 
           {filteredJobs.map((job) => (
             <div key={job.id} 
